@@ -14,16 +14,18 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String textHolder = "Log in";
   bool enabled = true;
+  bool loading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   Future<User> _signIn() async {
     setState(() {
       enabled = false;
+      loading = true;
     });
     GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
     GoogleSignInAuthentication googleSignInAuthentication =
-    await googleSignInAccount.authentication;
+        await googleSignInAccount.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleSignInAuthentication.accessToken,
       idToken: googleSignInAuthentication.idToken,
@@ -38,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     print("Sign in Error $e");
     setState(() {
       enabled = true;
+      loading = false;
     });
   }
 
@@ -90,10 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(4),
                       splashColor: primaryColor,
-                      onTap: () =>
-                          _signIn()
-                              .then((value) => navigateToHomeScreen())
-                              .catchError((e) => handleError(e)),
+                      onTap: () => _signIn()
+                          .then((value) => navigateToHomeScreen())
+                          .catchError((e) => handleError(e)),
                       child: Card(
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -106,22 +108,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           child: Padding(
                             padding: const EdgeInsets.all(8),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "assets/images/google.png",
-                                  fit: BoxFit.contain,
-                                  width: 20,
-                                  height: 20,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text("Log in to get started")
-                              ],
-                            ),
+                            child: !loading
+                                ? Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        "assets/images/google.png",
+                                        fit: BoxFit.contain,
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text("Log in to get started")
+                                    ],
+                                  )
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
                           ),
                         ),
                       ),
@@ -160,5 +167,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-
