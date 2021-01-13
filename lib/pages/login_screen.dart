@@ -6,6 +6,9 @@ import 'package:notes/pages/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = "/login";
+  final data;
+
+  LoginScreen({this.data});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
